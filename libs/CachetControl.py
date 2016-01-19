@@ -37,9 +37,11 @@ class CachetControl(object):
             response = requests.get(self.__prefix + 'components', headers=self.__header)
         except requests.ConnectionError:
             raise Exception("REST Server not found!")
+        components = []
         json_data = json.loads(response.text)
-        print json.dumps(json_data, indent=2)
-        return
+        for component in json_data['data']:
+            components.append(component)
+        return components
 
     '''
     Get json response for incidents
@@ -92,6 +94,14 @@ class CachetControl(object):
     def mumbleMonitor(self):
         try:
             response = requests.post(self.__prefix + 'metrics/2/points', data={"value": "1"}, headers=self.__header)
+        except requests.ConnectionError:
+            raise Exception("REST Server not found!")
+        json_data = json.loads(response.text)
+        return
+
+    def setComponent(self, id, status):
+        try:
+            response = requests.put(self.__prefix + 'components/' + str(id), data={"status": str(status)}, headers=self.__header)
         except requests.ConnectionError:
             raise Exception("REST Server not found!")
         json_data = json.loads(response.text)
